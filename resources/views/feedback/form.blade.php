@@ -978,7 +978,7 @@
 
     <div class="footer">
         <p>This form is for IT Technical Support service evaluation only.</p>
-        <p style="margin-top:.3rem">Responses are reviewed by management and kept confidential.</p>
+        <p style="margin-top:.3rem">Responses are kept confidential.</p>
     </div>
 
 <script>
