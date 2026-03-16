@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\Concerns\InteractsWithDashboardFilters;
 use App\Models\Agent;
 use App\Models\Feedback;
 use App\Models\Question;
@@ -10,23 +11,48 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class FeedbackStatsOverview extends BaseWidget
 {
+    use InteractsWithDashboardFilters;
+
     protected static ?int $sort = 1;
 
     protected function getStats(): array
     {
-        $totalFeedbacks = Feedback::count();
-        $avgRating = round(Feedback::avg('overall_rating') ?? 0, 2);
-        $activeAgents = Agent::active()->count();
-        $activeQuestions = Question::active()->count();
+        $range        = $this->getDateRange();
+        $agentIds     = $this->getAgentIds();
+        $issueTypeIds = $this->getIssueTypeIds();
 
-        $recentAvg = round(
-            Feedback::where('created_at', '>=', now()->subDays(7))->avg('overall_rating') ?? 0,
-            2
-        );
+        // Base query scoped to date range + agents + issue types
+        $base = Feedback::query();
+
+        if (! empty($agentIds)) {
+            $base->whereHas('agents', fn ($q) => $q->whereIn('agents.id', $agentIds));
+        }
+
+        if (! empty($issueTypeIds)) {
+            $base->whereIn('issue_type_id', $issueTypeIds);
+        }
+
+        $this->applyDateConstraint($base, $range);
+
+        $totalFeedbacks = (clone $base)->count();
+        $avgRating      = round((clone $base)->avg('overall_rating') ?? 0, 2);
 
         $satisfactionPct = $totalFeedbacks > 0
-            ? round((Feedback::where('overall_rating', '>=', 4)->count() / $totalFeedbacks) * 100)
+            ? round(((clone $base)->where('overall_rating', '>=', 4)->count() / $totalFeedbacks) * 100)
             : 0;
+
+        // Last 7 days — scoped to agents + issue types (not date range) so it always reflects recent activity
+        $recentBase = Feedback::query()->where('created_at', '>=', now()->subDays(7));
+        if (! empty($agentIds)) {
+            $recentBase->whereHas('agents', fn ($q) => $q->whereIn('agents.id', $agentIds));
+        }
+        if (! empty($issueTypeIds)) {
+            $recentBase->whereIn('issue_type_id', $issueTypeIds);
+        }
+        $recentAvg = round($recentBase->avg('overall_rating') ?? 0, 2);
+
+        $activeAgents   = Agent::active()->count();
+        $activeQuestions = Question::active()->count();
 
         return [
             Stat::make('Total Feedback Received', $totalFeedbacks)
