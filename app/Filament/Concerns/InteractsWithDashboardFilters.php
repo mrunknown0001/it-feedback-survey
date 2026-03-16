@@ -38,6 +38,11 @@ trait InteractsWithDashboardFilters
         return $this->filters['issue_type_ids'] ?? [];
     }
 
+    protected function getLocationIds(): array
+    {
+        return $this->filters['location_ids'] ?? [];
+    }
+
     protected function quarterDates(string $quarter): array
     {
         $year = Carbon::now()->year;

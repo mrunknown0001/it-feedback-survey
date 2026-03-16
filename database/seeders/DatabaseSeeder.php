@@ -45,6 +45,8 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             IssueTypeSeeder::class,
+            QuestionSeeder::class,
+            LocationSeeder::class,
         ]);
     }
 }

@@ -10,7 +10,7 @@
 
     // Determine which step to open when validation errors exist
     $initialStep = 0;
-    if ($errors->any() && ! $errors->hasAny(['respondent_name', 'position', 'agent_ids', 'issue_type_id'])) {
+    if ($errors->any() && ! $errors->hasAny(['respondent_name', 'position', 'agent_ids', 'issue_type_id', 'location_ids'])) {
         foreach ($questionChunks as $ci => $chunk) {
             foreach ($chunk as $q) {
                 if ($errors->has("responses.{$q->id}")) {
@@ -768,6 +768,63 @@
                     </div>
                 </div>
 
+                <div class="form-grid form-grid-2" style="margin-top:1.25rem">
+                    <div class="field">
+                        <label>Location / Area / Department <span class="req">*</span></label>
+
+                        @php $oldLocations = old('location_ids', []); @endphp
+                        <div id="location-hidden-inputs">
+                            @foreach ($oldLocations as $lid)
+                                <input type="hidden" name="location_ids[]" value="{{ $lid }}">
+                            @endforeach
+                        </div>
+
+                        <div class="ms-wrap" id="location-ms">
+                            <div class="ms-trigger" tabindex="0" id="location-trigger" aria-haspopup="listbox" aria-expanded="false">
+                                <span class="ms-trigger-text" id="location-tags">
+                                    <span class="ms-placeholder" id="location-placeholder">— Select location(s) —</span>
+                                </span>
+                                <svg class="ms-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                    <polyline points="6 9 12 15 18 9"/>
+                                </svg>
+                            </div>
+
+                            <div class="ms-dropdown" role="listbox" aria-multiselectable="true">
+                                <div class="ms-search-wrap">
+                                    <input type="text" class="ms-search" id="location-search" placeholder="Search locations…" autocomplete="off">
+                                </div>
+                                <div class="ms-list" id="location-list">
+                                    @foreach ($locations as $loc)
+                                    <div class="ms-option"
+                                         data-value="{{ $loc->id }}"
+                                         data-label="{{ $loc->name }}"
+                                         data-search="{{ strtolower($loc->name . ' ' . ($loc->code ?? '')) }}"
+                                         role="option">
+                                        <input type="checkbox" value="{{ $loc->id }}"
+                                               {{ in_array($loc->id, $oldLocations) ? 'checked' : '' }}>
+                                        <span class="ms-checkbox">
+                                            <svg viewBox="0 0 12 10" fill="none" stroke="currentColor" stroke-width="2">
+                                                <polyline points="1 5 4.5 8.5 11 1"/>
+                                            </svg>
+                                        </span>
+                                        <span class="ms-option-label">
+                                            {{ $loc->name }}
+                                            @if ($loc->code)
+                                                <span class="ms-option-sub">&nbsp;{{ $loc->code }}</span>
+                                            @endif
+                                        </span>
+                                    </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+
+                        @error('location_ids')
+                            <span class="field-error">⚠ {{ $message }}</span>
+                        @enderror
+                    </div>
+                </div>
+
                 <div class="form-grid" style="margin-top:1.25rem">
                     <div class="field">
                         <label>IT Support Agent(s) That Assisted You <span class="req">*</span></label>
@@ -1151,6 +1208,90 @@
     }
 })();
 
+/* ── Multi-select location dropdown ─────────────────────── */
+(function () {
+    const wrap        = document.getElementById('location-ms');
+    const trigger     = document.getElementById('location-trigger');
+    const tagsEl      = document.getElementById('location-tags');
+    const placeholder = document.getElementById('location-placeholder');
+    const searchEl    = document.getElementById('location-search');
+    const listEl      = document.getElementById('location-list');
+    const hiddenWrap  = document.getElementById('location-hidden-inputs');
+    const options     = [...listEl.querySelectorAll('.ms-option')];
+
+    let selected = new Set(
+        [...hiddenWrap.querySelectorAll('input')].map(i => i.value)
+    );
+
+    function render() {
+        tagsEl.innerHTML = '';
+        hiddenWrap.innerHTML = '';
+
+        if (selected.size === 0) {
+            tagsEl.appendChild(placeholder);
+            placeholder.style.display = '';
+        } else {
+            placeholder.style.display = 'none';
+            selected.forEach(val => {
+                const opt = listEl.querySelector(`[data-value="${val}"]`);
+                if (!opt) return;
+                const tag = document.createElement('span');
+                tag.className = 'ms-tag';
+                tag.textContent = opt.dataset.label;
+                tagsEl.appendChild(tag);
+
+                const inp = document.createElement('input');
+                inp.type = 'hidden';
+                inp.name = 'location_ids[]';
+                inp.value = val;
+                hiddenWrap.appendChild(inp);
+            });
+        }
+
+        options.forEach(opt => {
+            opt.querySelector('input[type="checkbox"]').checked = selected.has(opt.dataset.value);
+        });
+    }
+
+    trigger.addEventListener('click', () => toggleOpen());
+    trigger.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleOpen(); }
+        if (e.key === 'Escape') close();
+    });
+
+    function toggleOpen() {
+        const isOpen = wrap.classList.toggle('open');
+        trigger.setAttribute('aria-expanded', isOpen);
+        if (isOpen) { searchEl.focus(); }
+    }
+    function close() {
+        wrap.classList.remove('open');
+        trigger.setAttribute('aria-expanded', 'false');
+    }
+
+    document.addEventListener('click', e => {
+        if (!wrap.contains(e.target)) close();
+    });
+
+    options.forEach(opt => {
+        opt.addEventListener('click', () => {
+            const val = opt.dataset.value;
+            if (selected.has(val)) { selected.delete(val); } else { selected.add(val); }
+            render();
+            trigger.classList.remove('input-error');
+        });
+    });
+
+    searchEl.addEventListener('input', () => {
+        const q = searchEl.value.toLowerCase();
+        options.forEach(opt => {
+            opt.style.display = opt.dataset.search.includes(q) ? '' : 'none';
+        });
+    });
+
+    render();
+})();
+
 /* ── Multi-step navigation ───────────────────────────────── */
 (function () {
     const totalSteps  = {{ $totalSteps }};
@@ -1211,6 +1352,13 @@
                 agentTrigger.classList.add('input-error');
                 valid = false;
                 if (!firstError) firstError = agentTrigger;
+            }
+            const locationTrigger = document.getElementById('location-trigger');
+            const locationCount   = document.querySelectorAll('#location-hidden-inputs input').length;
+            if (locationCount === 0) {
+                locationTrigger.classList.add('input-error');
+                valid = false;
+                if (!firstError) firstError = locationTrigger;
             }
             const issueTrigger = document.getElementById('issue-type-trigger');
             if (!document.getElementById('issue-type-hidden').value) {

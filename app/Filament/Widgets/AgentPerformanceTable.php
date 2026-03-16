@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
+use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 
 class AgentPerformanceTable extends BaseWidget
@@ -20,6 +21,24 @@ class AgentPerformanceTable extends BaseWidget
     protected static ?int $sort = 3;
 
     protected int | string | array $columnSpan = 'full';
+
+    public function render(): View
+    {
+        if (! isset($this->table)) {
+            $this->bootedInteractsWithTable();
+        }
+
+        return parent::render();
+    }
+
+    public function getTable(): Table
+    {
+        if (! isset($this->table)) {
+            $this->bootedInteractsWithTable();
+        }
+
+        return parent::getTable();
+    }
 
     // -------------------------------------------------------------------------
     // Helpers

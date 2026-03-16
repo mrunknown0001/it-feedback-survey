@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\FeedbackResource\Pages;
 use App\Models\Feedback;
+use App\Models\Location;
 use Filament\Forms\Form;
 use Filament\Infolists;
 use Filament\Infolists\Infolist;
@@ -35,6 +36,10 @@ class FeedbackResource extends Resource
                 ->schema([
                     Infolists\Components\TextEntry::make('respondent_name')->label('Name'),
                     Infolists\Components\TextEntry::make('position')->label('Position'),
+                    Infolists\Components\TextEntry::make('locations.name')
+                        ->label('Location / Area / Department')
+                        ->badge()
+                        ->separator(','),
                     Infolists\Components\TextEntry::make('agents.name')
                         ->label('IT Support Agent(s)')
                         ->badge()
@@ -97,6 +102,12 @@ class FeedbackResource extends Resource
                 Tables\Columns\TextColumn::make('position')
                     ->searchable(),
 
+                Tables\Columns\TextColumn::make('locations.name')
+                    ->label('Location / Area / Dept.')
+                    ->badge()
+                    ->separator(',')
+                    ->searchable(),
+
                 Tables\Columns\TextColumn::make('agents.name')
                     ->label('Agent(s)')
                     ->badge()
@@ -120,6 +131,12 @@ class FeedbackResource extends Resource
                     ->sortable(),
             ])
             ->filters([
+                Tables\Filters\SelectFilter::make('locations')
+                    ->label('Location / Area / Department')
+                    ->relationship('locations', 'name')
+                    ->multiple()
+                    ->preload(),
+
                 Tables\Filters\SelectFilter::make('agents')
                     ->relationship('agents', 'name')
                     ->multiple(),

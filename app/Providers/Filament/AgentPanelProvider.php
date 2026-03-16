@@ -25,6 +25,7 @@ class AgentPanelProvider extends PanelProvider
             ->id('agent')
             ->path('agent')
             ->login()
+            ->revealablePasswords(false)
             ->colors([
                 'primary' => Color::Blue,
             ])

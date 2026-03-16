@@ -28,6 +28,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->revealablePasswords(false)
             ->colors([
                 'primary' => Color::Cyan,
             ])

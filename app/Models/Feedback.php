@@ -23,6 +23,11 @@ class Feedback extends Model
         return $this->belongsTo(IssueType::class);
     }
 
+    public function locations(): BelongsToMany
+    {
+        return $this->belongsToMany(Location::class, 'feedback_location');
+    }
+
     public function agents(): BelongsToMany
     {
         return $this->belongsToMany(Agent::class, 'feedback_agent');

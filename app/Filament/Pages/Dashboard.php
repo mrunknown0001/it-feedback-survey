@@ -5,6 +5,7 @@ namespace App\Filament\Pages;
 use App\Models\Agent;
 use App\Models\Feedback;
 use App\Models\IssueType;
+use App\Models\Location;
 use App\Models\Question;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
@@ -75,8 +76,15 @@ class Dashboard extends BaseDashboard
                     ->options(fn () => IssueType::orderBy('name')->pluck('name', 'id')->toArray())
                     ->multiple()
                     ->searchable()
-                    ->live()
-                    ->columnSpan(4),
+                    ->live(),
+
+                Select::make('location_ids')
+                    ->label('Locations')
+                    ->placeholder('All locations')
+                    ->options(fn () => Location::orderBy('sort_order')->orderBy('name')->pluck('name', 'id')->toArray())
+                    ->multiple()
+                    ->searchable()
+                    ->live(),
             ])
             ->columns(4);
     }

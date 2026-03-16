@@ -6,6 +6,7 @@ use App\Models\Agent;
 use App\Models\Feedback;
 use App\Models\FeedbackResponse;
 use App\Models\IssueType;
+use App\Models\Location;
 use App\Models\Question;
 use Illuminate\Http\Request;
 
@@ -16,8 +17,9 @@ class FeedbackController extends Controller
         $agents      = Agent::active()->orderBy('name')->get();
         $questions   = Question::active()->get();
         $issueTypes  = IssueType::active()->orderBy('sort_order')->orderBy('name')->get();
+        $locations   = Location::active()->get();
 
-        return view('feedback.form', compact('agents', 'questions', 'issueTypes'));
+        return view('feedback.form', compact('agents', 'questions', 'issueTypes', 'locations'));
     }
 
     public function store(Request $request)
@@ -31,6 +33,8 @@ class FeedbackController extends Controller
             'agent_ids.*'       => 'exists:agents,id',
             'issue_type_id'     => 'required|exists:issue_types,id',
             'issue_description' => 'nullable|string|max:2000',
+            'location_ids'      => 'required|array|min:1',
+            'location_ids.*'    => 'exists:locations,id',
         ];
 
         foreach ($questions as $question) {
@@ -48,6 +52,8 @@ class FeedbackController extends Controller
             'agent_ids.min'             => 'Please select at least one IT support agent.',
             'issue_type_id.required'    => 'Please select an issue / request type.',
             'issue_type_id.exists'      => 'The selected issue type is invalid.',
+            'location_ids.required'     => 'Please select at least one location / area / department.',
+            'location_ids.min'          => 'Please select at least one location / area / department.',
         ]);
 
         $feedback = Feedback::create([
@@ -59,6 +65,7 @@ class FeedbackController extends Controller
         ]);
 
         $feedback->agents()->attach($validated['agent_ids']);
+        $feedback->locations()->attach($validated['location_ids']);
 
         $responses   = $validated['responses'] ?? [];
         $ratingSum   = 0;
