@@ -6,9 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Feedback extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'feedbacks';
 
     protected $fillable = ['respondent_name', 'position', 'issue_type_id', 'issue_description', 'overall_rating'];

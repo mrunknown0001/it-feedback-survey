@@ -23,6 +23,9 @@ class RatingTrendChart extends ChartWidget
         $agentIds     = $this->getAgentIds();
         $issueTypeIds = $this->getIssueTypeIds();
 
+        $cacheKey = 'widget_trend_' . md5(serialize([$range, $agentIds, $issueTypeIds]));
+
+        return cache()->remember($cacheKey, 300, function () use ($range, $agentIds, $issueTypeIds) {
         if ($range) {
             [$from, $to] = $range;
             $from = $from ?? now()->subDays(29)->startOfDay();
@@ -71,6 +74,7 @@ class RatingTrendChart extends ChartWidget
             ],
             'labels' => $days->map(fn ($d) => Carbon::parse($d)->format('M d'))->toArray(),
         ];
+        });
     }
 
     protected function getType(): string

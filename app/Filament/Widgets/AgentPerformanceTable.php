@@ -154,6 +154,7 @@ class AgentPerformanceTable extends BaseWidget
                         );
                     }),
             ])
-            ->defaultSort('feedbacks_count', 'desc');
+            ->defaultSort('feedbacks_count', 'desc')
+            ->paginated([25, 50, 100]);
     }
 }
