@@ -1,11 +1,18 @@
 <?php
 
 use App\Http\Controllers\FeedbackController;
+use App\Http\Controllers\TurnstileController;
+use App\Http\Middleware\CheckTurnstile;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [FeedbackController::class, 'show'])->name('feedback.form');
-Route::post('/feedback', [FeedbackController::class, 'store'])->middleware('throttle:5,1')->name('feedback.store');
-Route::get('/feedback/thanks', [FeedbackController::class, 'thanks'])->name('feedback.thanks');
+Route::get('/', [TurnstileController::class, 'show'])->name('turnstile.challenge');
+Route::post('/turnstile/verify', [TurnstileController::class, 'verify'])->name('turnstile.verify')->middleware('throttle:10,1');
+
+Route::middleware(CheckTurnstile::class)->group(function () {
+    Route::get('/form', [FeedbackController::class, 'show'])->name('feedback.form');
+    Route::post('/feedback', [FeedbackController::class, 'store'])->middleware('throttle:5,1')->name('feedback.store');
+    Route::get('/feedback/thanks', [FeedbackController::class, 'thanks'])->name('feedback.thanks');
+});
 
 // Temporary OAuth routes for Google Drive refresh token — remove after setup
 Route::get('refresh-token', function () {
