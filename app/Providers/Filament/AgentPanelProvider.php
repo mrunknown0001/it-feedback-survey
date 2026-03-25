@@ -16,6 +16,7 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use App\Filament\Pages\Auth\Login;
 
 class AgentPanelProvider extends PanelProvider
 {
@@ -24,7 +25,7 @@ class AgentPanelProvider extends PanelProvider
         return $panel
             ->id('agent')
             ->path('agent')
-            ->login()
+            ->login(Login::class)
             ->revealablePasswords(false)
             ->colors([
                 'primary' => Color::Blue,
