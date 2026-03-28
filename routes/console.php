@@ -11,3 +11,4 @@ use Illuminate\Support\Facades\Schedule;
 
 Schedule::command('backup:run --only-db')->at('18:00')->days([1, 2, 3, 4, 5, 6]);
 Schedule::command('backup:clean')->dailyAt('02:30');
+Schedule::command('google:check-token')->weeklyOn(1, '08:00');

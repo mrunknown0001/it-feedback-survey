@@ -32,7 +32,7 @@ class AppServiceProvider extends ServiceProvider
                 $client->fetchAccessTokenWithRefreshToken($config['refreshToken']);
 
                 $service = new \Google\Service\Drive($client);
-                $adapter = new \Masbug\Flysystem\GoogleDriveAdapter($service, null, ['sharedFolderId' => $config['folderId']]);
+                $adapter = new \Masbug\Flysystem\GoogleDriveAdapter($service, $config['folderPath'] ?? '/');
                 $driver  = new \League\Flysystem\Filesystem($adapter);
 
                 return new \Illuminate\Filesystem\FilesystemAdapter($driver, $adapter);

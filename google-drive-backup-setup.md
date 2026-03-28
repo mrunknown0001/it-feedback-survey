@@ -219,6 +219,7 @@ use Illuminate\Support\Facades\Schedule;
 
 Schedule::command('backup:run --only-db')->dailyAt('02:00');
 Schedule::command('backup:clean')->dailyAt('02:30');
+Schedule::command('google:check-token')->weeklyOn(1, '08:00'); // token health check
 ```
 
 **Laravel 10 and below** (`app/Console/Kernel.php`):
@@ -227,6 +228,7 @@ protected function schedule(Schedule $schedule): void
 {
     $schedule->command('backup:run --only-db')->dailyAt('02:00');
     $schedule->command('backup:clean')->dailyAt('02:30');
+    $schedule->command('google:check-token')->weeklyOn(1, '08:00'); // token health check
 }
 ```
 
@@ -257,6 +259,132 @@ Check your Google Drive folder — a `TrayMon/` (or your `APP_NAME`) subfolder w
 
 ---
 
+## 11. Token Health Check Command
+
+Refresh tokens can expire silently — backups will fail with no visible error unless you add monitoring. Create an artisan command to verify the token is still valid and send an email alert if not.
+
+Create `app/Console/Commands/CheckGoogleDriveToken.php`:
+
+```php
+<?php
+
+namespace App\Console\Commands;
+
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+
+class CheckGoogleDriveToken extends Command
+{
+    protected $signature = 'google:check-token';
+    protected $description = 'Verify Google Drive OAuth token is valid and alert if not';
+
+    public function handle(): int
+    {
+        try {
+            $config = config('filesystems.disks.google');
+
+            if (empty($config['refreshToken'])) {
+                $this->fail('GOOGLE_DRIVE_REFRESH_TOKEN is not set in .env');
+            }
+
+            $client = new \Google\Client();
+            $client->setClientId($config['clientId']);
+            $client->setClientSecret($config['clientSecret']);
+            $client->addScope(\Google\Service\Drive::DRIVE);
+
+            $newToken = $client->fetchAccessTokenWithRefreshToken($config['refreshToken']);
+
+            if (isset($newToken['error'])) {
+                $message = 'Google Drive token is invalid or expired: ' . ($newToken['error_description'] ?? $newToken['error']);
+                Log::error('[GoogleDriveToken] ' . $message);
+                $this->sendAlert($message);
+                $this->error($message);
+                return self::FAILURE;
+            }
+
+            $this->info('Google Drive token is valid.');
+            Log::info('[GoogleDriveToken] Token check passed.');
+
+            return self::SUCCESS;
+        } catch (\Exception $e) {
+            $message = 'Google Drive token check failed: ' . $e->getMessage();
+            Log::error('[GoogleDriveToken] ' . $message);
+            $this->sendAlert($message);
+            $this->error($message);
+            return self::FAILURE;
+        }
+    }
+
+    protected function sendAlert(string $message): void
+    {
+        $to = config('backup.notifications.mail.to');
+
+        if (empty($to)) {
+            return;
+        }
+
+        try {
+            Mail::raw(
+                "TrayMon Alert: Google Drive authentication failed.\n\n{$message}\n\nAction required: Re-run the OAuth flow at https://yourdomain.com/refresh-token to get a new refresh token.",
+                fn ($mail) => $mail->to($to)->subject('[TrayMon] Google Drive Token Expired — Action Required')
+            );
+        } catch (\Exception $e) {
+            Log::error('[GoogleDriveToken] Failed to send alert email: ' . $e->getMessage());
+        }
+    }
+}
+```
+
+Then add to the schedule (see Step 8). Run manually to test:
+
+```bash
+php artisan google:check-token
+```
+
+---
+
+## 12. Refresh Token Expiration — Causes and Recovery
+
+### Why tokens expire
+
+| Cause | Details |
+|-------|---------|
+| **OAuth consent screen in Testing mode** | Tokens expire after **7 days** — the most common cause |
+| **Token unused for 6 months** | Google automatically invalidates idle refresh tokens |
+| **User revoked access** | Via [myaccount.google.com/permissions](https://myaccount.google.com/permissions) |
+| **Google account password changed** | Invalidates all active tokens |
+| **More than 100 tokens issued** | Google caps active refresh tokens per user+client pair |
+
+### Prevention
+
+1. **Set OAuth consent screen to Production** (Step 1, item 8) — this alone eliminates the 7-day expiry. Tokens in Production mode do not have a fixed expiry unless one of the causes above occurs.
+2. **Run the weekly health check** (`google:check-token`) so you receive an email alert before noticing that backups stopped.
+3. Use the token at least once every 6 months — the daily backup schedule satisfies this automatically.
+
+### Recovery — how to get a new refresh token
+
+When a token expires, the `AppServiceProvider` catch block will silently swallow the error. Signs of expiry: backups stop appearing in Google Drive, or `php artisan google:check-token` returns a failure.
+
+To re-generate:
+
+1. Go to [myaccount.google.com/permissions](https://myaccount.google.com/permissions) and revoke the app's access (forces Google to issue a new refresh token on next auth).
+2. Visit `https://yourdomain.com/refresh-token` and complete the Google OAuth flow.
+3. Copy the new `refresh_token` from the JSON response.
+4. Update `.env`:
+   ```env
+   GOOGLE_DRIVE_REFRESH_TOKEN=new_token_here
+   ```
+5. Clear config cache and verify:
+   ```bash
+   php artisan config:clear
+   php artisan google:check-token
+   ```
+
+> **Note:** If you skip step 1 (revoking access), Google may not return a new `refresh_token` in the response — it only issues one on first authorization or after revocation.
+
+---
+
 ## Troubleshooting
 
 | Error | Cause | Fix |
@@ -264,10 +392,10 @@ Check your Google Drive folder — a `TrayMon/` (or your `APP_NAME`) subfolder w
 | `Driver [google] is not supported` | Driver not registered | Add `Storage::extend('google', ...)` in `AppServiceProvider` |
 | `401 UNAUTHENTICATED` | Wrong auth method (service account vs OAuth) | Use OAuth credentials (client_id, client_secret, refresh_token) |
 | `403 storageQuotaExceeded` | Using a service account | Service accounts have no Drive quota — use OAuth instead |
-| `Invalid token format` | Refresh token expired or wrong | Re-run `/refresh-token` route to get new token |
+| `Invalid token format` | Refresh token expired or wrong | See **Section 12** — revoke access then re-run `/refresh-token` |
 | `Unable to write file` | Wrong folder path | Set `GOOGLE_DRIVE_FOLDER_PATH` to the exact display name in Drive |
 | Blank page on `/refresh-token` | Config cached, `env()` not working | Use `config('filesystems.disks.google.clientId')` instead of `env()` |
-| OAuth token expires after 7 days | App in Testing mode | Set OAuth consent screen to **Production** in Google Cloud Console |
+| OAuth token expires after 7 days | App in Testing mode | Set OAuth consent screen to **Production** in Google Cloud Console (see **Section 12**) |
 
 ---
 
@@ -277,4 +405,5 @@ Check your Google Drive folder — a `TrayMon/` (or your `APP_NAME`) subfolder w
 - **`env()` does not work when config is cached** — always use `config()` in routes and controllers.
 - **`GOOGLE_DRIVE_FOLDER_PATH` is not the folder ID** — it is the human-readable folder name/path as it appears in Drive.
 - **Refresh token only appears once** — save it immediately. Revoke app access to force a new one.
-- **OAuth consent screen must be Production** — Testing mode tokens expire after 7 days.
+- **OAuth consent screen must be Production** — Testing mode tokens expire after 7 days. See Section 12 for all expiry causes and recovery steps.
+- **Add the `google:check-token` health check** (Section 11) — the `AppServiceProvider` catch block is silent; without monitoring you won't know the token died until backups stop.
