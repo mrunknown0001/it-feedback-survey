@@ -9,6 +9,7 @@ use App\Models\IssueType;
 use App\Models\Location;
 use App\Models\Question;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 
 class FeedbackController extends Controller
 {
@@ -24,6 +25,17 @@ class FeedbackController extends Controller
 
     public function store(Request $request)
     {
+        $token = $request->input('cf-turnstile-response');
+        $response = Http::asForm()->post('https://challenges.cloudflare.com/turnstile/v0/siteverify', [
+            'secret'   => config('services.turnstile.secret_key'),
+            'response' => $token,
+            'remoteip' => $request->ip(),
+        ]);
+
+        if (! ($response->json('success') === true)) {
+            return back()->withErrors(['captcha' => 'Security check failed. Please try again.'])->withInput();
+        }
+
         $questions = Question::active()->get();
 
         $rules = [

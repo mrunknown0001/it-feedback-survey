@@ -685,6 +685,7 @@
         .turnaround-notice svg { width: 14px; height: 14px; color: var(--primary); flex-shrink: 0; }
         .turnaround-notice strong { color: var(--primary); }
     </style>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 <body>
 
@@ -1032,6 +1033,14 @@
         </div>
         @endif
 
+        <!-- ── Turnstile ───────────────────────────── -->
+        <div id="turnstile-wrap" style="display:{{ $initialStep === $totalSteps - 1 ? 'flex' : 'none' }};flex-direction:column;align-items:center;gap:.5rem;margin-bottom:.75rem">
+            <div class="cf-turnstile" data-sitekey="{{ config('services.turnstile.site_key') }}" data-theme="dark"></div>
+            @error('captcha')
+                <span class="field-error">⚠ {{ $message }}</span>
+            @enderror
+        </div>
+
         <!-- ── Navigation ─────────────────────────── -->
         <div class="step-nav" id="step-nav">
             <button type="button" class="btn-prev {{ $initialStep === 0 ? 'hidden' : '' }}" id="btn-prev">← Back</button>
@@ -1329,6 +1338,7 @@
         btnPrev.classList.toggle('hidden',   step === 0);
         btnNext.classList.toggle('hidden',   step === totalSteps - 1);
         btnSubmit.classList.toggle('hidden', step !== totalSteps - 1);
+        document.getElementById('turnstile-wrap').style.display = step === totalSteps - 1 ? 'flex' : 'none';
         updateIndicator(step);
         validMsg.classList.add('hidden');
         window.scrollTo({ top: 0, behavior: 'smooth' });
