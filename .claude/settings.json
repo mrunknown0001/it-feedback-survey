@@ -8,7 +8,8 @@
       "Bash(php -l app/Support/Branding.php)",
       "Bash(php -l app/Filament/Pages/Settings.php)",
       "Bash(php -l database/migrations/2026_05_18_000000_create_settings_table.php)",
-      "Bash(php -l database/seeders/SettingSeeder.php)"
+      "Bash(php -l database/seeders/SettingSeeder.php)",
+      "Bash(sudo -n chown -R adam:adam app/Console/)"
     ]
   }
 }
