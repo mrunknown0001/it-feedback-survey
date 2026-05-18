@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('employee_id')->nullable()->unique();
-            $table->string('department')->default('IT Technical Support');
+            $table->string('department')->default('Human Resources');
             $table->string('email')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();

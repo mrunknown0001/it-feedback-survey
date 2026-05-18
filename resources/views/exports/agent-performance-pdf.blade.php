@@ -1,3 +1,8 @@
+@php
+    $brandName   = \App\Support\Branding::brandName();
+    $primaryHex  = \App\Support\Branding::primaryHex();
+    $primaryDark = \App\Support\Branding::primaryDark();
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,7 +17,7 @@
 
         .period-badge {
             display: inline-block;
-            background: #0891b2;
+            background: {{ $primaryDark }};
             color: #fff;
             font-size: 10px;
             padding: 2px 8px;
@@ -42,8 +47,8 @@
 <body>
 
 <div class="header">
-    <h1>Agent Performance Overview</h1>
-    <div class="meta">IT Technical Support Service &mdash; Feedback Analytics</div>
+    <h1>HR Personnel Performance Overview</h1>
+    <div class="meta">{{ $brandName }} &mdash; Feedback Analytics</div>
     @if($periodLabel)
         <div class="period-badge">{{ $periodLabel }}</div>
     @else
@@ -55,7 +60,7 @@
     <thead>
         <tr>
             <th>#</th>
-            <th>Agent</th>
+            <th>HR Personnel</th>
             <th>Department</th>
             <th>Total Feedback</th>
             <th>Avg. Rating</th>
@@ -100,7 +105,7 @@
 </table>
 
 <div class="footer">
-    Generated on {{ $generatedAt }} &bull; {{ $agents->count() }} agent(s) listed
+    Generated on {{ $generatedAt }} &bull; {{ $agents->count() }} HR personnel listed
     @if($periodLabel) &bull; Period: {{ $periodLabel }} @endif
 </div>
 

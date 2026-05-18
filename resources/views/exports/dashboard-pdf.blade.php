@@ -1,3 +1,8 @@
+@php
+    $brandName   = \App\Support\Branding::brandName();
+    $primaryHex  = \App\Support\Branding::primaryHex();
+    $primaryDark = \App\Support\Branding::primaryDark();
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,7 +17,7 @@
         .header .meta { font-size: 10px; color: #94a3b8; margin-top: 4px; }
         .period-badge {
             display: inline-block;
-            background: #0891b2;
+            background: {{ $primaryDark }};
             color: #fff;
             font-size: 10px;
             padding: 2px 8px;
@@ -27,7 +32,7 @@
             text-transform: uppercase;
             letter-spacing: 0.6px;
             color: #475569;
-            border-bottom: 2px solid #0891b2;
+            border-bottom: 2px solid {{ $primaryDark }};
             padding-bottom: 4px;
             margin: 0 24px 12px;
         }
@@ -42,7 +47,7 @@
             margin-right: 3%;
             background: #f8fafc;
             border: 1px solid #e2e8f0;
-            border-left: 4px solid #0891b2;
+            border-left: 4px solid {{ $primaryDark }};
             border-radius: 4px;
             padding: 10px 12px;
         }
@@ -54,7 +59,7 @@
         .kpi-green  { border-left-color: #16a34a; }
         .kpi-yellow { border-left-color: #ca8a04; }
         .kpi-red    { border-left-color: #dc2626; }
-        .kpi-blue   { border-left-color: #0891b2; }
+        .kpi-blue   { border-left-color: {{ $primaryDark }}; }
         .kpi-gray   { border-left-color: #94a3b8; }
 
         /* ── Tables ─────────────────────────────────────────────── */
@@ -67,9 +72,9 @@
 
         /* ── Rating bar ─────────────────────────────────────────── */
         .bar-track { background: #e2e8f0; border-radius: 2px; height: 8px; width: 100%; }
-        .bar-fill  { background: #0891b2; border-radius: 2px; height: 8px; }
+        .bar-fill  { background: {{ $primaryDark }}; border-radius: 2px; height: 8px; }
 
-        /* ── Agent badges ───────────────────────────────────────── */
+        /* ── HR personnel badges ────────────────────────────────── */
         .badge { display: inline-block; padding: 2px 7px; border-radius: 3px; font-size: 10px; font-weight: bold; }
         .badge-success { background: #dcfce7; color: #166534; }
         .badge-warning { background: #fef9c3; color: #854d0e; }
@@ -91,7 +96,7 @@
 {{-- ── Header ──────────────────────────────────────────────────────────── --}}
 <div class="header">
     <h1>Dashboard Report</h1>
-    <div class="meta">IT Technical Support Service &mdash; Feedback Analytics</div>
+    <div class="meta">{{ $brandName }} &mdash; Feedback Analytics</div>
     @if($periodLabel)
         <div class="period-badge">{{ $periodLabel }}</div>
     @else
@@ -127,8 +132,8 @@
         </div>
         <div class="kpi-box kpi-gray">
             <div class="kpi-value">{{ $activeAgents }}</div>
-            <div class="kpi-label">Active IT Agents</div>
-            <div class="kpi-desc">Available support personnel</div>
+            <div class="kpi-label">Active HR Personnel</div>
+            <div class="kpi-desc">Available HR staff</div>
         </div>
         <div class="kpi-box kpi-gray">
             <div class="kpi-value">{{ $activeQuestions }}</div>
@@ -170,12 +175,12 @@
     </table>
 @endif
 
-{{-- ── Agent Performance ────────────────────────────────────────────────── --}}
+{{-- ── HR Personnel Performance ─────────────────────────────────────────── --}}
 <div class="page-break"></div>
 
 <div class="header">
-    <h1>Agent Performance</h1>
-    <div class="meta">IT Technical Support Service &mdash; Feedback Analytics</div>
+    <h1>HR Personnel Performance</h1>
+    <div class="meta">{{ $brandName }} &mdash; Feedback Analytics</div>
     @if($periodLabel)
         <div class="period-badge">{{ $periodLabel }}</div>
     @else
@@ -183,13 +188,13 @@
     @endif
 </div>
 
-<div class="section-title">Agent Leaderboard</div>
+<div class="section-title">HR Personnel Leaderboard</div>
 
 <table>
     <thead>
         <tr>
             <th style="width: 5%;">#</th>
-            <th style="width: 25%;">Agent</th>
+            <th style="width: 25%;">HR Personnel</th>
             <th style="width: 20%;">Department</th>
             <th style="width: 15%;">Total Feedback</th>
             <th style="width: 20%;">Avg. Rating</th>
@@ -236,7 +241,7 @@
 {{-- ── Footer ───────────────────────────────────────────────────────────── --}}
 <div class="footer">
     Generated on {{ $generatedAt }}
-    &bull; {{ $agents->count() }} agent(s) listed
+    &bull; {{ $agents->count() }} HR personnel listed
     @if($periodLabel) &bull; Period: {{ $periodLabel }} @endif
 </div>
 

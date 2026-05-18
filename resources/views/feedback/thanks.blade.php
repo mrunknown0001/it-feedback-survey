@@ -1,17 +1,25 @@
+@php
+    $brandName    = \App\Support\Branding::brandName();
+    $primaryHex   = \App\Support\Branding::primaryHex();
+    $primaryDark  = \App\Support\Branding::primaryDark();
+    $primaryRgb   = \App\Support\Branding::primaryRgb();
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thank You – IT Technical Support Feedback</title>
+    <title>Thank You – {{ $brandName }}</title>
     <style>
         :root {
-            --bg-dark: #0a0e1a;
-            --bg-card: #0f1629;
-            --border:  #1e3a5f;
-            --cyan:    #06b6d4;
-            --text:    #e2e8f0;
-            --text-dim:#94a3b8;
+            --bg-dark:     #0a0e1a;
+            --bg-card:     #0f1629;
+            --border:      #1e3a5f;
+            --primary:     {{ $primaryHex }};
+            --primary-dark:{{ $primaryDark }};
+            --primary-rgb: {{ $primaryRgb }};
+            --text:        #e2e8f0;
+            --text-dim:    #94a3b8;
         }
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -24,7 +32,7 @@
             justify-content: center;
             padding: 2rem;
             background-image:
-                radial-gradient(ellipse 80% 50% at 50% -20%, rgba(6,182,212,0.12) 0%, transparent 70%);
+                radial-gradient(ellipse 80% 50% at 50% -20%, rgba(var(--primary-rgb),0.12) 0%, transparent 70%);
         }
         .container {
             text-align: center;
@@ -32,8 +40,8 @@
         }
         .icon-wrap {
             width: 80px; height: 80px;
-            background: rgba(6,182,212,.12);
-            border: 1px solid rgba(6,182,212,.35);
+            background: rgba(var(--primary-rgb),.12);
+            border: 1px solid rgba(var(--primary-rgb),.35);
             border-radius: 50%;
             display: inline-flex;
             align-items: center;
@@ -42,16 +50,16 @@
             animation: pulse 2s ease-in-out infinite;
         }
         @keyframes pulse {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(6,182,212,.25); }
-            50%       { box-shadow: 0 0 0 16px rgba(6,182,212,0); }
+            0%, 100% { box-shadow: 0 0 0 0 rgba(var(--primary-rgb),.25); }
+            50%       { box-shadow: 0 0 0 16px rgba(var(--primary-rgb),0); }
         }
-        .icon-wrap svg { width: 38px; height: 38px; color: var(--cyan); }
+        .icon-wrap svg { width: 38px; height: 38px; color: var(--primary); }
         h1 { font-size: 2rem; font-weight: 700; color: #fff; margin-bottom: .75rem; }
-        h1 span { color: var(--cyan); }
+        h1 span { color: var(--primary); }
         p { color: var(--text-dim); line-height: 1.65; margin-bottom: .5rem; }
         .divider {
             height: 1px;
-            background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
             margin: 1.75rem auto;
             max-width: 180px;
             opacity: .4;
@@ -60,13 +68,13 @@
             display: inline-block;
             margin-top: 1.5rem;
             padding: .75rem 2rem;
-            background: linear-gradient(135deg, #0891b2, #06b6d4);
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
             color: #fff;
             font-weight: 700;
             border-radius: 8px;
             text-decoration: none;
             font-size: .95rem;
-            box-shadow: 0 0 20px rgba(6,182,212,.3);
+            box-shadow: 0 0 20px rgba(var(--primary-rgb),.3);
             transition: opacity .2s;
         }
         .btn:hover { opacity: .85; }
@@ -84,12 +92,12 @@
         <h1>Thank <span>You!</span></h1>
         <div class="divider"></div>
         <p>Your feedback has been successfully submitted.</p>
-        <p>We appreciate you taking the time to evaluate our IT Technical Support services. Your insights help us continuously improve.</p>
+        <p>We appreciate you taking the time to evaluate our HR services. Your insights help us continuously improve.</p>
 
         <a href="{{ route('feedback.form') }}" class="btn">Submit Another Response</a>
 
         <div class="footer">
-            <p>IT Technical Support Services &nbsp;·&nbsp; Service Feedback System</p>
+            <p>{{ $brandName }} &nbsp;·&nbsp; Service Feedback System</p>
         </div>
     </div>
 </body>

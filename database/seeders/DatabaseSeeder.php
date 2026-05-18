@@ -19,31 +19,32 @@ class DatabaseSeeder extends Seeder
     {
         // Admin user — full access to /admin panel
         User::factory()->create([
-            'name'     => 'Admin User',
-            'email'    => 'admin@app.com',
+            'name' => 'Admin User',
+            'email' => 'admin@app.com',
             'password' => Hash::make('password'),
-            'role'     => 'admin',
+            'role' => 'admin',
         ]);
 
-        // Create a sample agent to link to the agent user
+        // Create a sample HR personnel record to link to the HR user
         $agent = Agent::create([
-            'name'        => 'John Dela Cruz',
-            'employee_id' => 'EMP-001',
-            'department'  => 'IT Technical Support',
-            'email'       => 'agent@example.com',
-            'is_active'   => true,
+            'name' => 'Jane Dela Cruz',
+            'employee_id' => 'HR-001',
+            'department' => 'Human Resources',
+            'email' => 'hr@example.com',
+            'is_active' => true,
         ]);
 
-        // Agent user — scoped access to /agent panel
+        // HR personnel login — scoped access to /agent panel
         User::factory()->create([
-            'name'     => 'John Dela Cruz',
-            'email'    => 'agent@example.com',
+            'name' => 'Jane Dela Cruz',
+            'email' => 'hr@example.com',
             'password' => Hash::make('password'),
-            'role'     => 'agent',
+            'role' => 'agent',
             'agent_id' => $agent->id,
         ]);
 
         $this->call([
+            SettingSeeder::class,
             IssueTypeSeeder::class,
             QuestionSeeder::class,
             LocationSeeder::class,

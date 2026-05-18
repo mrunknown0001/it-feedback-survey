@@ -1,3 +1,9 @@
+@php
+    $brandName    = \App\Support\Branding::brandName();
+    $primaryHex   = \App\Support\Branding::primaryHex();
+    $primaryDark  = \App\Support\Branding::primaryDark();
+    $primaryLight = \App\Support\Branding::primaryLight();
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,7 +20,7 @@
         }
 
         .header {
-            background-color: #1e40af;
+            background-color: {{ $primaryDark }};
             color: #ffffff;
             padding: 20px 30px;
             margin-bottom: 24px;
@@ -36,8 +42,8 @@
         }
 
         .summary-box {
-            background: #eff6ff;
-            border: 1px solid #bfdbfe;
+            background: {{ $primaryLight }}22;
+            border: 1px solid {{ $primaryLight }};
             border-radius: 6px;
             padding: 14px 18px;
             margin-bottom: 20px;
@@ -46,7 +52,7 @@
         .summary-box h2 {
             margin: 0 0 10px 0;
             font-size: 13px;
-            color: #1e40af;
+            color: {{ $primaryDark }};
         }
 
         .stats-row {
@@ -62,7 +68,7 @@
         .stat-value {
             font-size: 18px;
             font-weight: bold;
-            color: #1e40af;
+            color: {{ $primaryDark }};
         }
 
         .stat-label {
@@ -79,7 +85,7 @@
         }
 
         thead tr {
-            background-color: #1e40af;
+            background-color: {{ $primaryDark }};
             color: #ffffff;
         }
 
@@ -120,8 +126,8 @@
         .section-title {
             font-size: 14px;
             font-weight: bold;
-            color: #1e40af;
-            border-bottom: 2px solid #bfdbfe;
+            color: {{ $primaryDark }};
+            border-bottom: 2px solid {{ $primaryLight }};
             padding-bottom: 6px;
             margin: 20px 0 12px 0;
         }
@@ -138,8 +144,8 @@
 </head>
 <body>
     <div class="header">
-        <h1>IT Support Feedback Report</h1>
-        <p><strong>Agent:</strong> {{ $agent->name ?? 'N/A' }} ({{ $agent->employee_id ?? 'N/A' }})</p>
+        <h1>HR Personnel Feedback Report</h1>
+        <p><strong>HR Personnel:</strong> {{ $agent->name ?? 'N/A' }} ({{ $agent->employee_id ?? 'N/A' }})</p>
         <p><strong>Department:</strong> {{ $agent->department ?? 'N/A' }}</p>
         <p><strong>Generated:</strong> {{ $generated }}</p>
     </div>
@@ -241,7 +247,7 @@
         @endif
 
         <div class="footer">
-            IT Technical Support Service &bull; Feedback Survey System &bull; Generated {{ $generated }}
+            {{ $brandName }} &bull; Feedback Survey System &bull; Generated {{ $generated }}
         </div>
     </div>
 </body>

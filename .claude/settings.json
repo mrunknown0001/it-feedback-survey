@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls /var/www/html 2>&1 | head -5; pwd)",
+      "Read(//var/www/**)",
+      "Bash(./vendor/bin/pint app/Filament/Pages/Settings.php app/Models/Setting.php app/Support/Branding.php app/Providers/Filament/AdminPanelProvider.php app/Providers/Filament/AgentPanelProvider.php app/Filament/Resources/AgentResource.php app/Filament/Resources/FeedbackResource.php app/Filament/Widgets/AgentPerformanceTable.php app/Filament/Widgets/FeedbackStatsOverview.php app/Filament/Widgets/RatingTrendChart.php app/Filament/Widgets/IssueTypeBreakdownChart.php app/Filament/Widgets/RatingDistributionChart.php app/Filament/Pages/Dashboard.php app/Http/Controllers/FeedbackController.php database/seeders/ database/migrations/2026_05_18_000000_create_settings_table.php)",
+      "Bash(php -l app/Models/Setting.php)",
+      "Bash(php -l app/Support/Branding.php)",
+      "Bash(php -l app/Filament/Pages/Settings.php)",
+      "Bash(php -l database/migrations/2026_05_18_000000_create_settings_table.php)",
+      "Bash(php -l database/seeders/SettingSeeder.php)"
+    ]
+  }
+}

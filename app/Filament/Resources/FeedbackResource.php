@@ -4,7 +4,6 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\FeedbackResource\Pages;
 use App\Models\Feedback;
-use App\Models\Location;
 use Filament\Forms\Form;
 use Filament\Infolists;
 use Filament\Infolists\Infolist;
@@ -41,18 +40,18 @@ class FeedbackResource extends Resource
                         ->badge()
                         ->separator(','),
                     Infolists\Components\TextEntry::make('agents.name')
-                        ->label('IT Support Agent(s)')
+                        ->label('HR Personnel')
                         ->badge()
                         ->separator(','),
                     Infolists\Components\TextEntry::make('overall_rating')
                         ->label('Overall Rating')
                         ->badge()
-                        ->color(fn ($state) => match(true) {
+                        ->color(fn ($state) => match (true) {
                             $state >= 4.5 => 'success',
-                            $state >= 3   => 'warning',
-                            default       => 'danger',
+                            $state >= 3 => 'warning',
+                            default => 'danger',
                         })
-                        ->formatStateUsing(fn ($state) => number_format($state, 2) . ' / 5.00'),
+                        ->formatStateUsing(fn ($state) => number_format($state, 2).' / 5.00'),
                     Infolists\Components\TextEntry::make('created_at')
                         ->label('Submitted At')
                         ->dateTime(),
@@ -69,11 +68,11 @@ class FeedbackResource extends Resource
                             Infolists\Components\TextEntry::make('rating_value')
                                 ->label('Rating')
                                 ->badge()
-                                ->color(fn ($state) => match(true) {
+                                ->color(fn ($state) => match (true) {
                                     $state >= 4 => 'success',
                                     $state >= 3 => 'warning',
                                     $state !== null => 'danger',
-                                    default     => 'gray',
+                                    default => 'gray',
                                 })
                                 ->formatStateUsing(fn ($state) => $state ? "⭐ {$state} / 5" : '—'),
                             Infolists\Components\TextEntry::make('text_value')
@@ -109,7 +108,7 @@ class FeedbackResource extends Resource
                     ->searchable(),
 
                 Tables\Columns\TextColumn::make('agents.name')
-                    ->label('Agent(s)')
+                    ->label('HR Personnel')
                     ->badge()
                     ->separator(',')
                     ->searchable(),
@@ -117,12 +116,12 @@ class FeedbackResource extends Resource
                 Tables\Columns\TextColumn::make('overall_rating')
                     ->label('Rating')
                     ->badge()
-                    ->color(fn ($state) => match(true) {
+                    ->color(fn ($state) => match (true) {
                         $state >= 4.5 => 'success',
-                        $state >= 3   => 'warning',
-                        default       => 'danger',
+                        $state >= 3 => 'warning',
+                        default => 'danger',
                     })
-                    ->formatStateUsing(fn ($state) => number_format($state, 2) . ' ★')
+                    ->formatStateUsing(fn ($state) => number_format($state, 2).' ★')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('created_at')
@@ -138,6 +137,7 @@ class FeedbackResource extends Resource
                     ->preload(),
 
                 Tables\Filters\SelectFilter::make('agents')
+                    ->label('HR Personnel')
                     ->relationship('agents', 'name')
                     ->multiple(),
             ])
@@ -156,7 +156,7 @@ class FeedbackResource extends Resource
     {
         return [
             'index' => Pages\ListFeedback::route('/'),
-            'view'  => Pages\ViewFeedback::route('/{record}'),
+            'view' => Pages\ViewFeedback::route('/{record}'),
         ];
     }
 }

@@ -16,11 +16,11 @@ class AgentPerformanceTable extends BaseWidget
 {
     use InteractsWithDashboardFilters;
 
-    protected static ?string $heading = 'Agent Performance Overview';
+    protected static ?string $heading = 'HR Personnel Performance Overview';
 
     protected static ?int $sort = 3;
 
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     public function render(): View
     {
@@ -53,22 +53,22 @@ class AgentPerformanceTable extends BaseWidget
             $year = Carbon::now()->year;
 
             return match ($quarter) {
-                'q1'    => "Q1 {$year} (Jan – Mar)",
-                'q2'    => "Q2 {$year} (Apr – Jun)",
-                'q3'    => "Q3 {$year} (Jul – Sep)",
-                'q4'    => "Q4 {$year} (Oct – Dec)",
+                'q1' => "Q1 {$year} (Jan – Mar)",
+                'q2' => "Q2 {$year} (Apr – Jun)",
+                'q3' => "Q3 {$year} (Jul – Sep)",
+                'q4' => "Q4 {$year} (Oct – Dec)",
                 default => null,
             };
         }
 
         $from = filled($this->filters['date_from'] ?? null) ? Carbon::parse($this->filters['date_from']) : null;
-        $to   = filled($this->filters['date_to']   ?? null) ? Carbon::parse($this->filters['date_to'])   : null;
+        $to = filled($this->filters['date_to'] ?? null) ? Carbon::parse($this->filters['date_to']) : null;
 
         return match (true) {
-            $from && $to => $from->format('d M Y') . ' – ' . $to->format('d M Y'),
-            (bool) $from => 'From ' . $from->format('d M Y'),
-            (bool) $to   => 'Until ' . $to->format('d M Y'),
-            default      => null,
+            $from && $to => $from->format('d M Y').' – '.$to->format('d M Y'),
+            (bool) $from => 'From '.$from->format('d M Y'),
+            (bool) $to => 'Until '.$to->format('d M Y'),
+            default => null,
         };
     }
 
@@ -78,9 +78,9 @@ class AgentPerformanceTable extends BaseWidget
      */
     private function buildAgentQuery(): Builder
     {
-        $range        = $this->getDateRange();
+        $range = $this->getDateRange();
         $issueTypeIds = $this->getIssueTypeIds();
-        $query        = Agent::query();
+        $query = Agent::query();
 
         $constraint = function ($q) use ($range, $issueTypeIds): void {
             if ($range) {
@@ -118,7 +118,7 @@ class AgentPerformanceTable extends BaseWidget
             })
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->label('Agent')
+                    ->label('HR Personnel')
                     ->searchable(),
 
                 Tables\Columns\TextColumn::make('department'),
@@ -129,13 +129,13 @@ class AgentPerformanceTable extends BaseWidget
 
                 Tables\Columns\TextColumn::make('avg_rating')
                     ->label('Avg. Rating')
-                    ->getStateUsing(fn (Agent $record) => number_format($record->feedbacks_avg_overall_rating ?? 0, 2) . ' / 5.00')
+                    ->getStateUsing(fn (Agent $record) => number_format($record->feedbacks_avg_overall_rating ?? 0, 2).' / 5.00')
                     ->badge()
                     ->color(fn (Agent $record) => match (true) {
                         ($record->feedbacks_avg_overall_rating ?? 0) >= 4.5 => 'success',
-                        ($record->feedbacks_avg_overall_rating ?? 0) >= 3   => 'warning',
-                        ($record->feedbacks_avg_overall_rating ?? 0) > 0    => 'danger',
-                        default                                              => 'gray',
+                        ($record->feedbacks_avg_overall_rating ?? 0) >= 3 => 'warning',
+                        ($record->feedbacks_avg_overall_rating ?? 0) > 0 => 'danger',
+                        default => 'gray',
                     }),
 
                 Tables\Columns\IconColumn::make('is_active')
@@ -158,16 +158,16 @@ class AgentPerformanceTable extends BaseWidget
                         $periodLabel = $this->periodLabel();
 
                         $pdf = Pdf::loadView('exports.agent-performance-pdf', [
-                            'agents'      => $agents,
+                            'agents' => $agents,
                             'periodLabel' => $periodLabel,
                             'generatedAt' => Carbon::now()->format('d M Y, h:i A'),
                         ])->setPaper('a4', 'landscape');
 
-                        $slug     = $periodLabel ? '-' . str($periodLabel)->slug() : '';
-                        $filename = 'agent-performance' . $slug . '-' . Carbon::now()->format('Ymd') . '.pdf';
+                        $slug = $periodLabel ? '-'.str($periodLabel)->slug() : '';
+                        $filename = 'hr-personnel-performance'.$slug.'-'.Carbon::now()->format('Ymd').'.pdf';
 
                         return response()->streamDownload(
-                            fn () => print($pdf->output()),
+                            fn () => print ($pdf->output()),
                             $filename,
                             ['Content-Type' => 'application/pdf'],
                         );

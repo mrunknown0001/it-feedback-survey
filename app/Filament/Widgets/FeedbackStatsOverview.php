@@ -17,11 +17,11 @@ class FeedbackStatsOverview extends BaseWidget
 
     protected function getStats(): array
     {
-        $range        = $this->getDateRange();
-        $agentIds     = $this->getAgentIds();
+        $range = $this->getDateRange();
+        $agentIds = $this->getAgentIds();
         $issueTypeIds = $this->getIssueTypeIds();
 
-        $cacheKey = 'widget_stats_' . md5(serialize([$range, $agentIds, $issueTypeIds]));
+        $cacheKey = 'widget_stats_'.md5(serialize([$range, $agentIds, $issueTypeIds]));
 
         [$totalFeedbacks, $avgRating, $satisfactionPct, $recentAvg, $activeAgents, $activeQuestions]
             = cache()->remember($cacheKey, 300, function () use ($range, $agentIds, $issueTypeIds) {
@@ -43,9 +43,9 @@ class FeedbackStatsOverview extends BaseWidget
                      COUNT(CASE WHEN overall_rating >= 4 THEN 1 END) as high_ratings'
                 )->first();
 
-                $total      = $agg->total ?? 0;
-                $avg        = round($agg->avg_rating ?? 0, 2);
-                $satPct     = $total > 0 ? round(($agg->high_ratings / $total) * 100) : 0;
+                $total = $agg->total ?? 0;
+                $avg = round($agg->avg_rating ?? 0, 2);
+                $satPct = $total > 0 ? round(($agg->high_ratings / $total) * 100) : 0;
 
                 // Last 7 days — scoped to agents + issue types (not date range)
                 $recentBase = Feedback::query()->where('created_at', '>=', now()->subDays(7));
@@ -67,7 +67,7 @@ class FeedbackStatsOverview extends BaseWidget
                 ];
             });
 
-        $activeAgents    = $activeAgents ?? 0;
+        $activeAgents = $activeAgents ?? 0;
         $activeQuestions = $activeQuestions ?? 0;
 
         return [
@@ -76,23 +76,23 @@ class FeedbackStatsOverview extends BaseWidget
                 ->descriptionIcon('heroicon-m-clipboard-document-list')
                 ->color('primary'),
 
-            Stat::make('Overall Avg. Rating', $avgRating . ' / 5.00')
+            Stat::make('Overall Avg. Rating', $avgRating.' / 5.00')
                 ->description('Across all submissions')
                 ->descriptionIcon('heroicon-m-star')
                 ->color($avgRating >= 4 ? 'success' : ($avgRating >= 3 ? 'warning' : 'danger')),
 
-            Stat::make('Satisfaction Rate', $satisfactionPct . '%')
+            Stat::make('Satisfaction Rate', $satisfactionPct.'%')
                 ->description('Ratings of 4 or higher')
                 ->descriptionIcon('heroicon-m-face-smile')
                 ->color($satisfactionPct >= 70 ? 'success' : ($satisfactionPct >= 50 ? 'warning' : 'danger')),
 
-            Stat::make('Last 7 Days Avg.', $recentAvg . ' / 5.00')
+            Stat::make('Last 7 Days Avg.', $recentAvg.' / 5.00')
                 ->description('Recent performance')
                 ->descriptionIcon('heroicon-m-chart-bar')
                 ->color('info'),
 
-            Stat::make('Active IT Agents', $activeAgents)
-                ->description('Available support personnel')
+            Stat::make('Active HR Personnel', $activeAgents)
+                ->description('Available HR staff')
                 ->descriptionIcon('heroicon-m-user-group')
                 ->color('gray'),
 

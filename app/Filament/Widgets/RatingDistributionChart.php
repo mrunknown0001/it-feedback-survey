@@ -4,6 +4,7 @@ namespace App\Filament\Widgets;
 
 use App\Filament\Concerns\InteractsWithDashboardFilters;
 use App\Models\Feedback;
+use App\Support\Branding;
 use Filament\Widgets\ChartWidget;
 
 class RatingDistributionChart extends ChartWidget
@@ -16,12 +17,12 @@ class RatingDistributionChart extends ChartWidget
 
     protected static ?int $sort = 6;
 
-    protected int | string | array $columnSpan = 1;
+    protected int|string|array $columnSpan = 1;
 
     protected function getData(): array
     {
-        $range        = $this->getDateRange();
-        $agentIds     = $this->getAgentIds();
+        $range = $this->getDateRange();
+        $agentIds = $this->getAgentIds();
         $issueTypeIds = $this->getIssueTypeIds();
 
         $base = Feedback::query()->whereNotNull('overall_rating');
@@ -39,20 +40,22 @@ class RatingDistributionChart extends ChartWidget
         $counts = [1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0];
 
         foreach ($base->pluck('overall_rating') as $rating) {
-            $star           = max(1, min(5, (int) round($rating)));
+            $star = max(1, min(5, (int) round($rating)));
             $counts[$star]++;
         }
+
+        $primaryRgb = Branding::primaryRgb();
 
         return [
             'datasets' => [
                 [
-                    'data'            => array_values($counts),
+                    'data' => array_values($counts),
                     'backgroundColor' => [
                         'rgba(239,68,68,0.85)',
                         'rgba(249,115,22,0.85)',
                         'rgba(234,179,8,0.85)',
                         'rgba(34,197,94,0.85)',
-                        'rgba(6,182,212,0.85)',
+                        "rgba({$primaryRgb},0.85)",
                     ],
                     'hoverOffset' => 6,
                 ],

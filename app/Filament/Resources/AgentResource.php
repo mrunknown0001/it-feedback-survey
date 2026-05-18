@@ -19,7 +19,11 @@ class AgentResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
 
-    protected static ?string $navigationLabel = 'IT Support Agents';
+    protected static ?string $navigationLabel = 'HR Personnel';
+
+    protected static ?string $modelLabel = 'HR Personnel';
+
+    protected static ?string $pluralModelLabel = 'HR Personnel';
 
     protected static ?string $navigationGroup = 'Management';
 
@@ -28,7 +32,7 @@ class AgentResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Forms\Components\Section::make('Agent Information')
+            Forms\Components\Section::make('HR Personnel Information')
                 ->schema([
                     Forms\Components\TextInput::make('name')
                         ->required()
@@ -40,7 +44,7 @@ class AgentResource extends Resource
                         ->unique(ignoreRecord: true),
 
                     Forms\Components\TextInput::make('department')
-                        ->default('IT Technical Support')
+                        ->default('Human Resources')
                         ->maxLength(255),
 
                     Forms\Components\TextInput::make('email')
@@ -127,9 +131,10 @@ class AgentResource extends Resource
                         if (! $user) {
                             Notification::make()
                                 ->title('No login account found')
-                                ->body("Agent \"{$record->name}\" does not have a login account yet.")
+                                ->body("\"{$record->name}\" does not have a login account yet.")
                                 ->warning()
                                 ->send();
+
                             return;
                         }
 

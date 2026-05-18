@@ -20,31 +20,38 @@
             }
         }
     }
+
+    $brandName    = \App\Support\Branding::brandName();
+    $primaryHex   = \App\Support\Branding::primaryHex();
+    $primaryDark  = \App\Support\Branding::primaryDark();
+    $primaryLight = \App\Support\Branding::primaryLight();
+    $primaryRgb   = \App\Support\Branding::primaryRgb();
 @endphp
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IT Technical Support – Service Feedback</title>
+    <title>{{ $brandName }} – Service Feedback</title>
     <style>
         :root {
-            --bg-dark:    #0a0e1a;
-            --bg-card:    #0f1629;
-            --bg-input:   #131d35;
-            --border:     #1e3a5f;
-            --border-glow:#0ea5e9;
-            --cyan:       #06b6d4;
-            --cyan-light: #67e8f9;
-            --cyan-dark:  #0891b2;
-            --text:       #e2e8f0;
-            --text-muted: #64748b;
-            --text-dim:   #94a3b8;
-            --star-off:   #1e293b;
-            --star-on:    #06b6d4;
-            --success:    #10b981;
-            --danger:     #ef4444;
-            --radius:     10px;
+            --bg-dark:     #0a0e1a;
+            --bg-card:     #0f1629;
+            --bg-input:    #131d35;
+            --border:      #1e3a5f;
+            --primary:     {{ $primaryHex }};
+            --primary-light:{{ $primaryLight }};
+            --primary-dark: {{ $primaryDark }};
+            --primary-rgb: {{ $primaryRgb }};
+            --border-glow: var(--primary);
+            --text:        #e2e8f0;
+            --text-muted:  #64748b;
+            --text-dim:    #94a3b8;
+            --star-off:    #1e293b;
+            --star-on:     var(--primary);
+            --success:     #10b981;
+            --danger:      #ef4444;
+            --radius:      10px;
         }
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -56,9 +63,9 @@
             min-height: 100vh;
             padding: 2rem 1rem 4rem;
             background-image:
-                radial-gradient(ellipse 80% 50% at 50% -20%, rgba(6,182,212,0.10) 0%, transparent 70%),
-                repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(6,182,212,0.03) 39px, rgba(6,182,212,0.03) 40px),
-                repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(6,182,212,0.03) 39px, rgba(6,182,212,0.03) 40px);
+                radial-gradient(ellipse 80% 50% at 50% -20%, rgba(var(--primary-rgb),0.10) 0%, transparent 70%),
+                repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(var(--primary-rgb),0.03) 39px, rgba(var(--primary-rgb),0.03) 40px),
+                repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(var(--primary-rgb),0.03) 39px, rgba(var(--primary-rgb),0.03) 40px);
         }
 
         /* ── Header ─────────────────────────────── */
@@ -71,9 +78,9 @@
             display: inline-flex;
             align-items: center;
             gap: .5rem;
-            background: rgba(6,182,212,.12);
-            border: 1px solid rgba(6,182,212,.30);
-            color: var(--cyan);
+            background: rgba(var(--primary-rgb),.12);
+            border: 1px solid rgba(var(--primary-rgb),.30);
+            color: var(--primary);
             font-size: .75rem;
             font-weight: 600;
             letter-spacing: .1em;
@@ -89,7 +96,7 @@
             color: #fff;
             line-height: 1.2;
         }
-        .header h1 span { color: var(--cyan); }
+        .header h1 span { color: var(--primary); }
         .header p {
             margin-top: .75rem;
             color: var(--text-dim);
@@ -99,7 +106,7 @@
         }
         .divider {
             height: 1px;
-            background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
             margin: 1.5rem auto;
             max-width: 200px;
             opacity: .5;
@@ -120,7 +127,7 @@
             position: absolute;
             inset: 0;
             border-radius: var(--radius);
-            background: linear-gradient(135deg, rgba(6,182,212,.04) 0%, transparent 60%);
+            background: linear-gradient(135deg, rgba(var(--primary-rgb),.04) 0%, transparent 60%);
             pointer-events: none;
         }
         .card-title {
@@ -128,7 +135,7 @@
             font-weight: 700;
             letter-spacing: .12em;
             text-transform: uppercase;
-            color: var(--cyan);
+            color: var(--primary);
             margin-bottom: 1.25rem;
             display: flex;
             align-items: center;
@@ -155,7 +162,7 @@
             color: var(--text-dim);
             letter-spacing: .03em;
         }
-        label .req { color: var(--cyan); margin-left: 2px; }
+        label .req { color: var(--primary); margin-left: 2px; }
 
         input[type="text"],
         input[type="email"],
@@ -174,7 +181,7 @@
         }
         input:focus, select:focus, textarea:focus {
             border-color: var(--border-glow);
-            box-shadow: 0 0 0 3px rgba(6,182,212,.12);
+            box-shadow: 0 0 0 3px rgba(var(--primary-rgb),.12);
         }
         select option { background: #0f1629; }
         textarea { resize: vertical; min-height: 90px; }
@@ -208,15 +215,15 @@
         .ms-trigger:focus,
         .ms-wrap.open .ms-trigger {
             border-color: var(--border-glow);
-            box-shadow: 0 0 0 3px rgba(6,182,212,.12);
+            box-shadow: 0 0 0 3px rgba(var(--primary-rgb),.12);
             outline: none;
         }
         .ms-trigger-text { flex: 1; flex-wrap: wrap; display: flex; gap: .35rem; align-items: center; }
         .ms-placeholder { color: var(--text-muted); }
         .ms-tag {
-            background: rgba(6,182,212,.18);
-            border: 1px solid rgba(6,182,212,.35);
-            color: var(--cyan-light);
+            background: rgba(var(--primary-rgb),.18);
+            border: 1px solid rgba(var(--primary-rgb),.35);
+            color: var(--primary-light);
             font-size: .72rem;
             font-weight: 600;
             padding: .15rem .5rem;
@@ -275,11 +282,11 @@
             font-size: .88rem;
             transition: background .15s;
         }
-        .ms-option:hover { background: rgba(6,182,212,.07); }
+        .ms-option:hover { background: rgba(var(--primary-rgb),.07); }
         .ms-option.all-option {
             border-bottom: 1px solid var(--border);
             font-weight: 600;
-            color: var(--cyan);
+            color: var(--primary);
         }
         .ms-option input[type="checkbox"] { display: none; }
         .ms-checkbox {
@@ -295,8 +302,8 @@
         }
         .ms-option input:checked ~ .ms-checkbox,
         .ms-option.all-checked .ms-checkbox {
-            background: var(--cyan);
-            border-color: var(--cyan);
+            background: var(--primary);
+            border-color: var(--primary);
         }
         .ms-checkbox svg { display: none; width: 10px; height: 10px; color: #fff; }
         .ms-option input:checked ~ .ms-checkbox svg,
@@ -312,7 +319,7 @@
             padding: 1.25rem 1.5rem;
             transition: border-color .2s;
         }
-        .question-item:focus-within { border-color: rgba(6,182,212,.4); }
+        .question-item:focus-within { border-color: rgba(var(--primary-rgb),.4); }
         .question-meta {
             display: flex;
             align-items: flex-start;
@@ -322,9 +329,9 @@
         .q-number {
             flex-shrink: 0;
             width: 28px; height: 28px;
-            background: rgba(6,182,212,.15);
-            border: 1px solid rgba(6,182,212,.3);
-            color: var(--cyan);
+            background: rgba(var(--primary-rgb),.15);
+            border: 1px solid rgba(var(--primary-rgb),.3);
+            color: var(--primary);
             border-radius: 6px;
             font-size: .75rem;
             font-weight: 700;
@@ -341,7 +348,7 @@
             border-radius: 4px;
             flex-shrink: 0;
         }
-        .q-type-badge.rating { background: rgba(6,182,212,.12); color: var(--cyan); }
+        .q-type-badge.rating { background: rgba(var(--primary-rgb),.12); color: var(--primary); }
         .q-type-badge.text   { background: rgba(99,102,241,.12); color: #a5b4fc; }
         .q-text {
             font-size: .9rem;
@@ -411,7 +418,7 @@
             max-width: 760px;
             margin: 2rem auto 0;
         }
-        .footer a { color: var(--cyan); text-decoration: none; }
+        .footer a { color: var(--primary); text-decoration: none; }
 
         /* ══════════════════════════════════════════════
            MULTI-STEP
@@ -441,7 +448,7 @@
         /* Filled progress (JS-controlled width) */
         .si-progress {
             height: 100%;
-            background: linear-gradient(90deg, var(--cyan-dark), var(--cyan));
+            background: linear-gradient(90deg, var(--primary-dark), var(--primary));
             border-radius: 1px;
             transition: width .45s ease;
             width: 0%;
@@ -469,14 +476,14 @@
             transition: border-color .3s, background .3s, color .3s, box-shadow .3s;
         }
         .si-step.active .si-dot {
-            border-color: var(--cyan);
-            background: rgba(6,182,212,.15);
-            color: var(--cyan);
-            box-shadow: 0 0 0 5px rgba(6,182,212,.12);
+            border-color: var(--primary);
+            background: rgba(var(--primary-rgb),.15);
+            color: var(--primary);
+            box-shadow: 0 0 0 5px rgba(var(--primary-rgb),.12);
         }
         .si-step.done .si-dot {
-            border-color: var(--cyan);
-            background: var(--cyan);
+            border-color: var(--primary);
+            background: var(--primary);
             color: #fff;
         }
         .si-num { line-height: 1; }
@@ -493,8 +500,8 @@
             white-space: nowrap;
             transition: color .3s;
         }
-        .si-step.active .si-label { color: var(--cyan); }
-        .si-step.done   .si-label { color: var(--cyan-dark); }
+        .si-step.active .si-label { color: var(--primary); }
+        .si-step.done   .si-label { color: var(--primary-dark); }
         @media (max-width: 500px) {
             .si-label { display: none; }
             .si-dot   { width: 30px; height: 30px; font-size: .72rem; }
@@ -524,9 +531,9 @@
             white-space: nowrap;
         }
         .btn-prev:hover {
-            border-color: var(--cyan);
-            color: var(--cyan);
-            background: rgba(6,182,212,.05);
+            border-color: var(--primary);
+            color: var(--primary);
+            background: rgba(var(--primary-rgb),.05);
         }
         .btn-next,
         .btn-submit {
@@ -534,20 +541,20 @@
             padding: .9rem;
             border: none;
             border-radius: 8px;
-            background: linear-gradient(135deg, #0891b2, #06b6d4);
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
             color: #fff;
             font-size: 1rem;
             font-weight: 700;
             letter-spacing: .05em;
             cursor: pointer;
             transition: opacity .2s, transform .1s, box-shadow .2s;
-            box-shadow: 0 0 20px rgba(6,182,212,.25);
+            box-shadow: 0 0 20px rgba(var(--primary-rgb),.25);
             font-family: inherit;
             display: block;
             width: 100%;
             margin: 0;
         }
-        .btn-next:hover, .btn-submit:hover { opacity: .9; box-shadow: 0 0 30px rgba(6,182,212,.4); }
+        .btn-next:hover, .btn-submit:hover { opacity: .9; box-shadow: 0 0 30px rgba(var(--primary-rgb),.4); }
         .btn-next:active, .btn-submit:active { transform: scale(.99); }
         .hidden { display: none !important; }
 
@@ -599,7 +606,7 @@
         .ss-trigger:focus,
         .ss-wrap.open .ss-trigger {
             border-color: var(--border-glow);
-            box-shadow: 0 0 0 3px rgba(6,182,212,.12);
+            box-shadow: 0 0 0 3px rgba(var(--primary-rgb),.12);
             outline: none;
         }
         .ss-trigger-text { flex: 1; }
@@ -649,8 +656,8 @@
             font-size: .88rem;
             transition: background .15s;
         }
-        .ss-option:hover { background: rgba(6,182,212,.07); }
-        .ss-option.selected { background: rgba(6,182,212,.12); color: var(--cyan); }
+        .ss-option:hover { background: rgba(var(--primary-rgb),.07); }
+        .ss-option.selected { background: rgba(var(--primary-rgb),.12); color: var(--primary); }
         .ss-empty {
             padding: .75rem .85rem;
             color: var(--text-muted);
@@ -667,16 +674,16 @@
             display: flex;
             align-items: center;
             gap: .5rem;
-            background: rgba(6,182,212,.08);
-            border: 1px solid rgba(6,182,212,.25);
+            background: rgba(var(--primary-rgb),.08);
+            border: 1px solid rgba(var(--primary-rgb),.25);
             border-radius: 6px;
             padding: .55rem .85rem;
             font-size: .82rem;
             color: var(--text-dim);
             margin-top: .45rem;
         }
-        .turnaround-notice svg { width: 14px; height: 14px; color: var(--cyan); flex-shrink: 0; }
-        .turnaround-notice strong { color: var(--cyan); }
+        .turnaround-notice svg { width: 14px; height: 14px; color: var(--primary); flex-shrink: 0; }
+        .turnaround-notice strong { color: var(--primary); }
     </style>
 </head>
 <body>
@@ -685,13 +692,13 @@
     <div class="header">
         <div class="header-badge">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
             </svg>
-            IT Technical Support Services
+            {{ $brandName }}
         </div>
         <h1>Service <span>Feedback</span> Form</h1>
         <div class="divider"></div>
-        <p>Help us improve our IT support services by sharing your experience. Your feedback is valued and confidential.</p>
+        <p>Help us improve our HR services by sharing your experience. Your feedback is valued and confidential.</p>
     </div>
 
     @if ($totalSteps > 1)
@@ -827,7 +834,7 @@
 
                 <div class="form-grid" style="margin-top:1.25rem">
                     <div class="field">
-                        <label>IT Support Agent(s) That Assisted You <span class="req">*</span></label>
+                        <label>HR Personnel That Assisted You <span class="req">*</span></label>
 
                         @php $oldAgents = old('agent_ids', []); @endphp
                         <div id="agent-hidden-inputs">
@@ -839,7 +846,7 @@
                         <div class="ms-wrap" id="agent-ms">
                             <div class="ms-trigger" tabindex="0" id="agent-trigger" aria-haspopup="listbox" aria-expanded="false">
                                 <span class="ms-trigger-text" id="agent-tags">
-                                    <span class="ms-placeholder" id="agent-placeholder">— Select agent(s) —</span>
+                                    <span class="ms-placeholder" id="agent-placeholder">— Select HR personnel —</span>
                                 </span>
                                 <svg class="ms-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                                     <polyline points="6 9 12 15 18 9"/>
@@ -848,7 +855,7 @@
 
                             <div class="ms-dropdown" role="listbox" aria-multiselectable="true">
                                 <div class="ms-search-wrap">
-                                    <input type="text" class="ms-search" id="agent-search" placeholder="Search agents…" autocomplete="off">
+                                    <input type="text" class="ms-search" id="agent-search" placeholder="Search HR personnel…" autocomplete="off">
                                 </div>
                                 <div class="ms-list" id="agent-list">
                                     <div class="ms-option all-option" data-all="true" role="option">
@@ -1034,7 +1041,7 @@
     </form>
 
     <div class="footer">
-        <p>This form is for IT Technical Support service evaluation only.</p>
+        <p>This form is for {{ $brandName }} service evaluation only.</p>
         <p style="margin-top:.3rem">Responses are kept confidential.</p>
     </div>
 

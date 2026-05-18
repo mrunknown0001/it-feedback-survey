@@ -16,6 +16,7 @@ use Filament\Forms\Form;
 use Filament\Forms\Set;
 use Filament\Pages\Dashboard as BaseDashboard;
 use Filament\Pages\Dashboard\Concerns\HasFiltersForm;
+use Illuminate\Database\Eloquent\Builder;
 
 class Dashboard extends BaseDashboard
 {
@@ -63,8 +64,8 @@ class Dashboard extends BaseDashboard
                     }),
 
                 Select::make('agent_ids')
-                    ->label('Agents')
-                    ->placeholder('All agents')
+                    ->label('HR Personnel')
+                    ->placeholder('All HR personnel')
                     ->options(fn () => Agent::orderBy('name')->pluck('name', 'id')->toArray())
                     ->multiple()
                     ->searchable()
@@ -97,9 +98,9 @@ class Dashboard extends BaseDashboard
                 ->icon('heroicon-o-document-arrow-down')
                 ->color('gray')
                 ->action(function () {
-                    $range     = $this->getDateRange();
-                    $agentIds  = $this->getAgentIds();
-                    $period    = $this->getPeriodLabel();
+                    $range = $this->getDateRange();
+                    $agentIds = $this->getAgentIds();
+                    $period = $this->getPeriodLabel();
 
                     // ── KPI stats ────────────────────────────────────────────
                     $base = Feedback::query();
@@ -108,8 +109,8 @@ class Dashboard extends BaseDashboard
                     }
                     $this->applyDateConstraint($base, $range);
 
-                    $totalFeedbacks  = (clone $base)->count();
-                    $avgRating       = round((clone $base)->avg('overall_rating') ?? 0, 2);
+                    $totalFeedbacks = (clone $base)->count();
+                    $avgRating = round((clone $base)->avg('overall_rating') ?? 0, 2);
                     $satisfactionPct = $totalFeedbacks > 0
                         ? round(((clone $base)->where('overall_rating', '>=', 4)->count() / $totalFeedbacks) * 100)
                         : 0;
@@ -120,23 +121,23 @@ class Dashboard extends BaseDashboard
                     }
                     $recentAvg = round($recentBase->avg('overall_rating') ?? 0, 2);
 
-                    $activeAgents    = Agent::active()->count();
+                    $activeAgents = Agent::active()->count();
                     $activeQuestions = Question::active()->count();
 
                     // ── Rating trend ─────────────────────────────────────────
                     if ($range) {
                         [$from, $to] = $range;
                         $trendFrom = $from ?? now()->subDays(29)->startOfDay();
-                        $trendTo   = $to   ?? now()->endOfDay();
+                        $trendTo = $to ?? now()->endOfDay();
                     } else {
                         $trendFrom = now()->subDays(29)->startOfDay();
-                        $trendTo   = now()->endOfDay();
+                        $trendTo = now()->endOfDay();
                     }
 
                     $trendDays = collect();
-                    $cur       = $trendFrom->copy()->startOfDay();
-                    $limit     = $trendTo->copy()->startOfDay();
-                    $cnt       = 0;
+                    $cur = $trendFrom->copy()->startOfDay();
+                    $limit = $trendTo->copy()->startOfDay();
+                    $cnt = 0;
                     while ($cur->lte($limit) && $cnt < 366) {
                         $trendDays->push($cur->toDateString());
                         $cur->addDay();
@@ -151,8 +152,8 @@ class Dashboard extends BaseDashboard
                     }
 
                     $trendRatings = $trendQuery->pluck('avg_rating', 'date');
-                    $trendData    = $trendDays->map(fn ($d) => [
-                        'date'   => Carbon::parse($d)->format('d M Y'),
+                    $trendData = $trendDays->map(fn ($d) => [
+                        'date' => Carbon::parse($d)->format('d M Y'),
                         'rating' => round($trendRatings[$d] ?? 0, 2),
                     ])->values();
 
@@ -160,7 +161,7 @@ class Dashboard extends BaseDashboard
                     $agentQuery = Agent::query();
                     if ($range) {
                         [$from, $to] = $range;
-                        $constraint  = function ($q) use ($from, $to): void {
+                        $constraint = function ($q) use ($from, $to): void {
                             if ($from && $to) {
                                 $q->whereBetween('feedbacks.created_at', [$from, $to]);
                             } elseif ($from) {
@@ -184,25 +185,25 @@ class Dashboard extends BaseDashboard
 
                     // ── Render PDF ───────────────────────────────────────────
                     $pdf = Pdf::loadView('exports.dashboard-pdf', [
-                        'periodLabel'     => $period,
-                        'generatedAt'     => Carbon::now()->format('d M Y, h:i A'),
-                        'totalFeedbacks'  => $totalFeedbacks,
-                        'avgRating'       => $avgRating,
+                        'periodLabel' => $period,
+                        'generatedAt' => Carbon::now()->format('d M Y, h:i A'),
+                        'totalFeedbacks' => $totalFeedbacks,
+                        'avgRating' => $avgRating,
                         'satisfactionPct' => $satisfactionPct,
-                        'recentAvg'       => $recentAvg,
-                        'activeAgents'    => $activeAgents,
+                        'recentAvg' => $recentAvg,
+                        'activeAgents' => $activeAgents,
                         'activeQuestions' => $activeQuestions,
-                        'trendData'       => $trendData,
-                        'trendFrom'       => $trendFrom->format('d M Y'),
-                        'trendTo'         => $trendTo->format('d M Y'),
-                        'agents'          => $agents,
+                        'trendData' => $trendData,
+                        'trendFrom' => $trendFrom->format('d M Y'),
+                        'trendTo' => $trendTo->format('d M Y'),
+                        'agents' => $agents,
                     ])->setPaper('a4', 'portrait');
 
-                    $slug     = $period ? '-' . str($period)->slug() : '';
-                    $filename = 'dashboard-report' . $slug . '-' . Carbon::now()->format('Ymd') . '.pdf';
+                    $slug = $period ? '-'.str($period)->slug() : '';
+                    $filename = 'dashboard-report'.$slug.'-'.Carbon::now()->format('Ymd').'.pdf';
 
                     return response()->streamDownload(
-                        fn () => print($pdf->output()),
+                        fn () => print ($pdf->output()),
                         $filename,
                         ['Content-Type' => 'application/pdf'],
                     );
@@ -243,22 +244,22 @@ class Dashboard extends BaseDashboard
             $year = Carbon::now()->year;
 
             return match ($quarter) {
-                'q1'    => "Q1 {$year} (Jan – Mar)",
-                'q2'    => "Q2 {$year} (Apr – Jun)",
-                'q3'    => "Q3 {$year} (Jul – Sep)",
-                'q4'    => "Q4 {$year} (Oct – Dec)",
+                'q1' => "Q1 {$year} (Jan – Mar)",
+                'q2' => "Q2 {$year} (Apr – Jun)",
+                'q3' => "Q3 {$year} (Jul – Sep)",
+                'q4' => "Q4 {$year} (Oct – Dec)",
                 default => null,
             };
         }
 
         $from = filled($this->filters['date_from'] ?? null) ? Carbon::parse($this->filters['date_from']) : null;
-        $to   = filled($this->filters['date_to']   ?? null) ? Carbon::parse($this->filters['date_to'])   : null;
+        $to = filled($this->filters['date_to'] ?? null) ? Carbon::parse($this->filters['date_to']) : null;
 
         return match (true) {
-            $from && $to => $from->format('d M Y') . ' – ' . $to->format('d M Y'),
-            (bool) $from => 'From ' . $from->format('d M Y'),
-            (bool) $to   => 'Until ' . $to->format('d M Y'),
-            default      => null,
+            $from && $to => $from->format('d M Y').' – '.$to->format('d M Y'),
+            (bool) $from => 'From '.$from->format('d M Y'),
+            (bool) $to => 'Until '.$to->format('d M Y'),
+            default => null,
         };
     }
 
@@ -267,15 +268,15 @@ class Dashboard extends BaseDashboard
         $year = Carbon::now()->year;
 
         return match ($quarter) {
-            'q1'    => [Carbon::create($year, 1,  1)->startOfDay(), Carbon::create($year,  3, 31)->endOfDay()],
-            'q2'    => [Carbon::create($year, 4,  1)->startOfDay(), Carbon::create($year,  6, 30)->endOfDay()],
-            'q3'    => [Carbon::create($year, 7,  1)->startOfDay(), Carbon::create($year,  9, 30)->endOfDay()],
-            'q4'    => [Carbon::create($year, 10, 1)->startOfDay(), Carbon::create($year, 12, 31)->endOfDay()],
+            'q1' => [Carbon::create($year, 1, 1)->startOfDay(), Carbon::create($year, 3, 31)->endOfDay()],
+            'q2' => [Carbon::create($year, 4, 1)->startOfDay(), Carbon::create($year, 6, 30)->endOfDay()],
+            'q3' => [Carbon::create($year, 7, 1)->startOfDay(), Carbon::create($year, 9, 30)->endOfDay()],
+            'q4' => [Carbon::create($year, 10, 1)->startOfDay(), Carbon::create($year, 12, 31)->endOfDay()],
             default => [],
         };
     }
 
-    private function applyDateConstraint(\Illuminate\Database\Eloquent\Builder $query, ?array $range): void
+    private function applyDateConstraint(Builder $query, ?array $range): void
     {
         if (! $range) {
             return;
@@ -285,8 +286,8 @@ class Dashboard extends BaseDashboard
 
         match (true) {
             (bool) $from && (bool) $to => $query->whereBetween('created_at', [$from, $to]),
-            (bool) $from               => $query->where('created_at', '>=', $from),
-            default                    => $query->where('created_at', '<=', $to),
+            (bool) $from => $query->where('created_at', '>=', $from),
+            default => $query->where('created_at', '<=', $to),
         };
     }
 }

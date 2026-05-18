@@ -4,6 +4,7 @@ namespace App\Filament\Widgets;
 
 use App\Filament\Concerns\InteractsWithDashboardFilters;
 use App\Models\IssueType;
+use App\Support\Branding;
 use Filament\Widgets\ChartWidget;
 
 class IssueTypeBreakdownChart extends ChartWidget
@@ -14,12 +15,12 @@ class IssueTypeBreakdownChart extends ChartWidget
 
     protected static ?int $sort = 4;
 
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     protected function getData(): array
     {
-        $range        = $this->getDateRange();
-        $agentIds     = $this->getAgentIds();
+        $range = $this->getDateRange();
+        $agentIds = $this->getAgentIds();
         $issueTypeIds = $this->getIssueTypeIds();
 
         $results = IssueType::query()
@@ -34,16 +35,22 @@ class IssueTypeBreakdownChart extends ChartWidget
             ->limit(10)
             ->get();
 
+        $primaryHex = Branding::primaryHex();
+        $primaryRgb = Branding::primaryRgb();
+
+        // Use the primary color with descending opacity so the palette
+        // automatically follows whatever the admin has selected.
+        $palette = collect(range(10, 1))->map(
+            fn ($i) => "rgba({$primaryRgb}, ".round($i / 10, 2).')'
+        )->toArray();
+
         return [
             'datasets' => [
                 [
-                    'label'           => 'Feedback Count',
-                    'data'            => $results->pluck('feedbacks_count')->toArray(),
-                    'backgroundColor' => [
-                        '#06b6d4', '#0891b2', '#0e7490', '#155e75', '#164e63',
-                        '#0284c7', '#0369a1', '#1d4ed8', '#4f46e5', '#7c3aed',
-                    ],
-                    'borderRadius'    => 4,
+                    'label' => 'Feedback Count',
+                    'data' => $results->pluck('feedbacks_count')->toArray(),
+                    'backgroundColor' => $palette,
+                    'borderRadius' => 4,
                 ],
             ],
             'labels' => $results->pluck('name')->toArray(),
@@ -64,7 +71,7 @@ class IssueTypeBreakdownChart extends ChartWidget
             'scales' => [
                 'y' => [
                     'beginAtZero' => true,
-                    'ticks'       => ['stepSize' => 1],
+                    'ticks' => ['stepSize' => 1],
                 ],
             ],
         ];

@@ -15,7 +15,7 @@ class LocationSeeder extends Seeder
             ['name' => 'Poultrypure Farms Corporation',         'code' => 'PFC',     'sort_order' => 3],
             ['name' => 'RH Farms',                              'code' => 'RH',      'sort_order' => 4],
             ['name' => 'Brookside Breeding and Genetics Corporation', 'code' => 'BBGC', 'sort_order' => 5],
-            ['name' => 'Hatchery',                              'code' => 'Hatchery','sort_order' => 6],
+            ['name' => 'Hatchery',                              'code' => 'Hatchery', 'sort_order' => 6],
             ['name' => 'Accounting',                            'code' => 'ACCTG',   'sort_order' => 7],
             ['name' => 'HR',                                    'code' => 'HR',      'sort_order' => 8],
             ['name' => 'Purchasing',                            'code' => 'PURCH',   'sort_order' => 9],
